@@ -36,7 +36,7 @@ namespace temp_back.Controllers
             Console.WriteLine($"List : Travaux");
             int element_skip = element_par_page * (page - 1);
             var list = _context.travaux.Where(t => t.Statut == 0).Include(t => t.Unite).ToList().Skip(element_skip).Take(element_par_page).ToList();
-            bool page_suivant = !_context.travaux.Where(t => t.Statut == 0).ToList().Skip(element_par_page * (page)).Take(element_par_page).ToList().IsNullOrEmpty();
+            bool page_suivant = !_context.travaux.Where(t => t.Statut == 0).Skip(element_par_page * (page)).Take(element_par_page).ToList().IsNullOrEmpty();
             Dictionary<string, object> dict = new Dictionary<string, object>();
             dict.Add("data", list);
             dict.Add("suivant", page_suivant);
