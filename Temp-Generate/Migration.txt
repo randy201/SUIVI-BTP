@@ -1,0 +1,4 @@
+﻿update-Database 	/ 	 Remove-Migration
+Add-Migration M-1 -c App_Db_Context -o Data/Migrations : All_type
+Add-Migration M-2 -c App_Db_Context -o Data/Migrations : test_double
+Add-Migration M-3 -c App_Db_Context -o Data/Migrations : Devis - Travaux - Maison - Unite - Detail_maison

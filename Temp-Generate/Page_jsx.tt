@@ -1,0 +1,38 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".jsx" #>
+<#
+    string Nom_fonction = "Type_finitions";
+#>
+import { Route, Routes } from "react-router-dom";
+import SideBar from "../components/SideBar";
+import Deconnexion from "../components/Deconnexion";
+import { useState } from "react";
+
+export default function <#=Nom_fonction#>() {
+    const [data_csv, setData_csv] = useState([]);
+    return (
+        <div className="page-body d-flex flex-row col-12">
+            <div className="side-bar-content col-2">
+                <SideBar />
+            </div>
+            <div className="page-content col">
+                <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                  <Deconnexion />
+                </div>
+                <h1>Page <#=Nom_fonction.ToLower()#></h1>
+                <Routes>
+                    <Route path="/" element={<>List_<#=Nom_fonction#> </>} />
+                    <Route path="detail/:id" element={<> Detail <#=Nom_fonction#></>} />
+                    <Route path="ajout" element={<>Ajout_<#=Nom_fonction#></>} />
+                    <Route path="supprimer/:id" element={<>Supprimer_<#=Nom_fonction#></>} />
+                    <Route path="import/list_import" element={<>List_PersonnesCSV data={data_csv} </>} />
+                    <Route path="import" element={ <>Import_CSV nom_controlleur={"<#=Nom_fonction#>s"} setData_csv={setData_csv} </> } />
+                </Routes>
+            </div>
+        </div>
+    );
+}

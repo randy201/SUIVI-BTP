@@ -1,0 +1,133 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".cs" #>
+<#
+    string RouteControlleur = "Payements";
+    string NomClasse = "Payement";
+#>
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.EntityFrameworkCore;
+using temp_back.Connexion;
+using NuGet.Protocol;
+using temp_back.Models;
+namespace temp_back.Controllers
+{
+    [ApiController]
+    [Route("<#=RouteControlleur#>")]
+    public class <#=NomClasse#>Controller : ControllerBase{
+        private readonly App_Db_Context _context;
+
+        public <#=NomClasse#>Controller(App_Db_Context context)
+        {
+            _context = context;
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<<#=NomClasse#>>>> Get<#=NomClasse#>s()
+        {
+            Console.WriteLine($"List : <#=RouteControlleur#>");
+            return await _context.<#=RouteControlleur.ToLower()#>.Where(t => t.Statut == 0).ToListAsync();
+        }
+
+        [HttpGet("pagination")]
+        public async Task<ActionResult<IEnumerable<<#=NomClasse#>>>> Get<#=NomClasse#>s_pagination(int page = 1, int element_par_page = 3)
+        {
+            Console.WriteLine($"List : <#=RouteControlleur#>");
+            int element_skip = element_par_page * (page - 1);
+            var list = _context.<#=RouteControlleur.ToLower()#>.ToList().Skip(element_skip).Take(element_par_page).ToList();
+            bool page_suivant = !_context.<#=RouteControlleur.ToLower()#>.ToList().Skip(element_par_page * (page)).Take(element_par_page).ToList().IsNullOrEmpty();
+            Dictionary<string, object> dict = new Dictionary<string, object>();
+            dict.Add("data", list);
+            dict.Add("suivant", page_suivant);
+            return Ok(dict);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<<#=NomClasse#>>> Get<#=NomClasse#>(int id)
+        {
+            Console.WriteLine($"Detail : <#=RouteControlleur#>/{id}");
+            var <#=NomClasse.ToLower()#> = await _context.<#=RouteControlleur.ToLower()#>.FindAsync(id);
+
+            if (<#=NomClasse.ToLower()#> == null || <#=NomClasse.ToLower()#>.Statut == 1 )
+            {
+                return NotFound($"<#=NomClasse#> est introuvable avec id ={id} ");
+            }
+            return <#=NomClasse.ToLower()#>;
+        }
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult<<#=NomClasse#>>> Put<#=NomClasse#>(int id, <#=NomClasse#> <#=NomClasse.ToLower()#>)
+        {
+            Console.WriteLine($"Modifier : <#=RouteControlleur#>/{id} || data = {<#=NomClasse.ToLower()#>.ToJson()}");
+            if (id != <#=NomClasse.ToLower()#>.Id_<#=NomClasse.ToLower()#>)
+            {
+                return BadRequest("Valeur id incorrect");
+            }
+
+            _context.<#=RouteControlleur.ToLower()#>.Update(<#=NomClasse.ToLower()#>);
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!<#=NomClasse#>Exists(id))
+                {
+                    return NotFound($"<#=NomClasse#> est introuvable avec id ={id}");
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            return Ok(<#=NomClasse.ToLower()#>);
+        }
+
+
+        [HttpPost]
+        public async Task<ActionResult<<#=NomClasse#>>> PostTestClass(<#=NomClasse#> <#=NomClasse.ToLower()#>)
+        {
+            Console.WriteLine($"Ajout : <#=RouteControlleur#> || data = {<#=NomClasse.ToLower()#>.ToJson()}");
+            if (!ModelState.IsValid)
+            {
+                return BadRequest($"Model state invalide \n {ModelState}");
+            }
+            _context.<#=RouteControlleur.ToLower()#>.Add(<#=NomClasse.ToLower()#>);
+            await _context.SaveChangesAsync();
+            return Ok(<#=NomClasse.ToLower()#>);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteTestClass(int id)
+        {
+            Console.WriteLine($"Supprimer : <#=RouteControlleur#>/{id}");
+            var <#=NomClasse.ToLower()#> = await _context.<#=RouteControlleur.ToLower()#>.FindAsync(id);
+            if (<#=NomClasse.ToLower()#> == null)
+            {
+                return NotFound("<#=RouteControlleur#> introuvable");
+            }
+            <#=NomClasse.ToLower()#>.Statut = 1;
+            await _context.SaveChangesAsync();
+            return Ok("supprimé");
+        }
+
+
+        [HttpPost("add_data")]
+        public async Task<IActionResult> data(List<object> list)
+        { return Ok(list); }
+
+        [HttpPost("importCSV")]
+        public async Task<IActionResult> ImportCSV(IFormFile fileFichier)
+        {return Ok(fileFichier);}
+
+        private bool <#=NomClasse#>Exists(int id)
+        {
+            return _context.<#=RouteControlleur.ToLower()#>.Any(e => e.Id_<#=NomClasse.ToLower()#> == id);
+        }
+
+    }
+}

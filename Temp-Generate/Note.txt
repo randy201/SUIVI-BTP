@@ -1,0 +1,24 @@
+﻿System.ArgumentException: Cannot write DateTimeOffset with Offset=03:00:00 to PostgreSQL type 'timestamp with time zone', only offset 0 (UTC) is supported. (Parameter 'value')at 
+Date time mila atta offset
+.yourEntity.DateTimeOffsetProperty = yourDateTimeOffset.ToUniversalTime();
+
+
+Package 
+Install-Package System.IdentityModel.Tokens.Jwt
+Install-Package Microsoft.AspNetCore.Authentication.JwtBearer
+Install-Package Swashbuckle.AspNetCore.Filters
+
+//utilisation script sql
+var sequenceValue = await _context.Database.ExecuteSqlRawAsync("SELECT nextval('seq_employer')");
+
+[HttpPost("recherche")]
+public async Task<ActionResult<Employer>> FullText(string searchTerm)
+{
+    string script =
+        "SELECT * FROM employers WHERE to_tsvector('french', employers.\"Nom\" || ' ' || employers.\"Prenom\") @@ to_tsquery('french', {0})";
+    var results = _context.employers
+        .FromSqlRaw(script, searchTerm)
+        .ToList();
+
+    return Ok(results);
+}

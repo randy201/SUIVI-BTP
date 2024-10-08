@@ -1,0 +1,172 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".jsx" #>
+
+<#
+    string Url = "Unites";
+    string Nom_objet = "Unite";
+#>
+const image = () => {
+    <img
+     style={{ width: "50px", height: "50px" }}
+     src={"/src/assets/" + <#=Nom_objet.ToLower()#>.image}
+     alt="image_photo_profil"
+    />
+}
+
+const getData = () => {
+  const [<#=Nom_objet.ToLower()#>, set<#=Nom_objet#>] = useState([]);
+
+    async function getData() {
+        try {
+            const url = `${URL}/<#=Url#>`;
+            let response = await axios.get(url);
+            response = response.data;
+            set<#=Nom_objet#>(response);
+        } catch (error) {
+            setMessage(httpErrorHandler(error));
+        }
+    }
+
+    useEffect(() => {
+        getData();
+    }, []);
+}
+
+const select = () => {
+    function changeSelect(e){
+        const selectedPersonne = listElement.find((element) => element.id === parseInt(e.target.value));
+        setPersonne(selectedPersonne);
+    }
+
+    const handlechangeSelect = (e) => {
+        setPersonne({
+            ...personne,
+            profil: { id: e.target.value },
+        });
+    };
+    return (<>
+        <select defaultValue={<#=Nom_objet#>.id} onChange={changeSelect}>
+            {listElement.map((element) => (
+                <option key={element.id} value={element.id}>
+                    {element.image}
+                </option>
+            ))}
+        </select>
+    </>)
+}
+
+const check_box = () => {
+    const [<#=Nom_objet.ToLower()#>, set<#=Nom_objet#>] = useState([]);
+    const [checkedValues, setCheckedValues] = useState([]);
+    
+    const handleCheckboxChange = (event) => {
+        const { value, checked } = event.target;
+        if (checked) {
+          // Si la case est cochée, ajouter la valeur à l'état
+          setCheckedValues([...checkedValues, value]);
+        } else {
+          // Si la case est décochée, retirer la valeur de l'état
+          setCheckedValues(checkedValues.filter((val) => val !== value));
+        }
+      };
+
+    return (<>
+
+        <label htmlFor="<#=Nom_objet.ToLower()#>"><#=Nom_objet#></label>
+          <div className="grid-container">
+            {place.map((obj) => (
+              <div key={obj.id_<#=Nom_objet.ToLower()#>} className="grid-item">
+                <input
+                  type="checkbox"
+                  name="id_<#=Nom_objet.ToLower()#>"
+                  id={obj.id_<#=Nom_objet.ToLower()#>}
+                  value={obj.id_<#=Nom_objet.ToLower()#>}
+                  defaultChecked={[58, 67, 62].includes(obj.id_<#=Nom_objet.ToLower()#>)}
+                  onChange={handleCheckboxChange}
+                />
+                <label htmlFor={obj.id_<#=Nom_objet.ToLower()#>}>{obj.nom}</label>
+              </div>
+            ))}
+          </div>
+
+      </>)
+}
+
+const radio = () => {
+    const [<#=Nom_objet.ToLower()#>, set<#=Nom_objet#>] = useState([]);
+
+    async function getData() {
+        try {
+            const url = `${URL}/<#=Url#>`;
+            let response = await axios.get(url);
+            response = response.data;
+            set<#=Nom_objet#>(response);
+        } catch (error) {
+            setMessage(httpErrorHandler(error));
+        }
+    }
+
+    useEffect(() => {
+        getData();
+    }, []);
+
+    return (<>
+
+        <label htmlFor=""><#=Nom_objet#></label>
+        <div className="grid-container">
+        {<#=Nom_objet.ToLower()#>.map((obj) => (
+            <div key={obj.id_<#=Nom_objet.ToLower()#>} className="grid-item">
+              
+                  <input
+                    type="radio"
+                    name="id_<#=Nom_objet.ToLower()#>"
+                    id={obj.id_<#=Nom_objet.ToLower()#>}
+                    defaultChecked={obj.id_<#=Nom_objet.ToLower()#> === 1}
+                    value={obj.id_<#=Nom_objet.ToLower()#>}
+
+                  />
+                  <label htmlFor={obj.id_<#=Nom_objet.ToLower()#>} >
+                    {obj.nom}
+                  </label>
+            </div>
+          ))}
+        </div>
+
+    </>
+}
+
+///Json no alefa
+
+let response = await axios.post(url, formData, {
+    headers: {
+        "Content-Type": "application/json",
+    },
+});
+
+//Beare
+axios.defaults.headers.common[
+        "Authorization"
+      ] = `Bearer ${localStorage.getItem("tokken")}`;
+      
+
+//Send objet
+const sendData = async () => {
+    const data = {
+      quantite: 0, // Par exemple, 0 comme quantité (à adapter à vos besoins)
+      nom: "huhu", // Utiliser les valeurs des cases cochées
+    };
+    try {
+      const url = `${URL}/<#=Url#>`;
+
+      let response = await axios.post(url, data);
+      if (response.status == 200) {
+        setMessage("Success");
+      }
+    } catch (error) {
+      setMessage(httpErrorHandler(error));
+    }
+  };

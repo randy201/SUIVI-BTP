@@ -1,0 +1,17 @@
+@temp_back_HostAddress = http://localhost:5071
+
+GET {{temp_back_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
+curl -X 'POST' \
+  'https://localhost:7011/Maisons' \
+  -H 'accept: text/plain' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "nom": "Antsika",
+  "prix_total": 0,
+  "durrer_totale": 5,
+  "description": "2chambres + 1douches"
+  
+}
